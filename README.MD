@@ -19,7 +19,7 @@ Included
 Dependencies
 -----
 When using link_state routing, 
-[cpp_link_state_algorithm](https://github.com/Niels-Post/cpp_mesh) is required to perform the algorithm.
+[cpp_link_state_algorithm](https://github.com/Niels-Post/cpp_link_state_algorithm) is required to perform the algorithm.
 
 When using the library with a microcontroller and the nrf connectivity adapter, [cpp_nrf24l01](https://github.com/Niels-Post/cpp_nrf24l01) is needed for communication with the NRF module.
 
