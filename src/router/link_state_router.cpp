@@ -8,6 +8,7 @@
 */
 
 #include <mesh/router/link_state_router.hpp>
+#include <cout_debug.hpp>
 
 namespace mesh {
     namespace routers {

@@ -45,7 +45,6 @@ namespace mesh {
          */
         class status_lcd {
 
-            mesh::mesh_network &network;
             lcd::i2c_backpack &lcd;
             display_mode current_mode;
         public:
@@ -54,12 +53,12 @@ namespace mesh {
              * @param network Network to show information for
              * @param lcd LCD display to show information on
              */
-            status_lcd(mesh_network &network, lcd::i2c_backpack &lcd);
+            status_lcd(lcd::i2c_backpack &lcd);
 
             /**
              * \brief Update the information currently shown on the LCD
              */
-            void update();
+            void update(mesh_network &network);
 
 
             /**

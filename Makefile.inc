@@ -23,7 +23,7 @@ HEADERS += $(MESH_DIR)include/mesh/router/link_state_router.hpp
 
 
 # The following files depend on HWLib, since they use its pin_out implementation
-ifdef ($(NO_HWLIB))
+ifndef ($(NO_HWLIB))
 SOURCES += $(MESH_DIR)src/connectivity/nrf.cpp
 SOURCES += $(MESH_DIR)src/connectivity/nrf_pipe.cpp
 HEADERS += $(MESH_DIR)include/mesh/connectivity/nrf.hpp

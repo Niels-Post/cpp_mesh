@@ -10,10 +10,10 @@
 #include <mesh/addon/status_lcd.hpp>
 #include <mesh/router/link_state_router.hpp>
 
-mesh::addons::status_lcd::status_lcd(mesh::mesh_network &network, lcd::i2c_backpack &lcd) : network(network), lcd(lcd),
-                                                                                            current_mode(GENERAL) {}
+mesh::addons::status_lcd::status_lcd(lcd::i2c_backpack &lcd) : lcd(lcd),
+                                                               current_mode(GENERAL) {}
 
-void mesh::addons::status_lcd::update() {
+void mesh::addons::status_lcd::update(mesh_network &network) {
     lcd.set_row(0);
     lcd << "ID: " << hwlib::hex << network.get_connection().id;
     switch (current_mode) {
@@ -39,7 +39,7 @@ void mesh::addons::status_lcd::update() {
         case BLACKLIST:
             break;
     }
-    lcd.flush();
+//    lcd.flush();
 }
 
 void mesh::addons::status_lcd::setCurrentMode(mesh::addons::display_mode currentMode) {

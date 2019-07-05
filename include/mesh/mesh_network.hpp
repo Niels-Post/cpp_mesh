@@ -13,6 +13,7 @@
 
 #include <mesh/connectivity_adapter.hpp>
 #include <mesh/router.hpp>
+#include <cout_debug.hpp>
 
 
 /**
@@ -53,7 +54,8 @@ namespace mesh {
         size_t blacklist_size = 0;
 
         uint32_t update_count = 0;
-        uint32_t keepalive_interval = 1000;
+        uint32_t keepalive_interval = 100;
+        uint32_t discovery_interval = 1000;
 
 
         /**
@@ -76,6 +78,7 @@ namespace mesh {
 
 
     public:
+
         /**
          * \brief Construct a mesh_network
          *
@@ -86,7 +89,7 @@ namespace mesh {
         mesh_network(connectivity_adapter &connection, router &networkrouter) :
                 connection(
                         connection),
-                network_router(networkrouter) {}
+                network_router(networkrouter){}
 
         /**
          * \brief Add the given nodes to the direct connection blacklist
@@ -110,6 +113,7 @@ namespace mesh {
          * Normally, the update function calls this method periodically, so it doesn't need to be called
          */
         void discover() {
+            LOG("DISCOVERYIN","");
             message message = {DISCOVERY::PRESENT, 0, connection.id, 0,
                                0};
             connection.send(message);
@@ -158,20 +162,20 @@ namespace mesh {
          * TODO: seperate this
          */
         void update() {
-            if (update_count++ > keepalive_interval) {
+            LOG("update", update_count);
+            if (update_count++ > discovery_interval) {
                 update_count = 0;
+                discover();
+            }
+            if ((update_count % keepalive_interval == 0)) {
+
                 message keepalive = {
                         DISCOVERY::NO_OPERATION,
                         0,
                         connection.id,
                         0
                 };
-
                 unicast_all_close_if_fail(keepalive);
-
-            }
-            if (update_count == keepalive_interval / 2) {
-                discover();
             }
         }
 
@@ -208,6 +212,7 @@ namespace mesh {
                         continue;
                     }
                     connection.remove_direct_connection(failed[i]);
+                    LOG("Removed", failed[i]);
                 }
                 network_router.send_update();
             }
@@ -238,6 +243,7 @@ namespace mesh {
          * @return True if the message was handled, false if it still needs to be handled by the caller
          */
         bool handleMessage(message &msg) {
+            LOG("MSG", msg.type << " " << hwlib::hex << msg.sender);
             if ((msg.type & 0x10) > 0) { //This is a routing message
                 network_router.on_routing_message(msg);
             }
@@ -253,18 +259,24 @@ namespace mesh {
 
             switch (msg.type) {
                 case DISCOVERY::PRESENT:
+                    LOG("Present", hwlib::hex << msg.sender);
                     if (connection.connection_state(msg.sender) == DISCONNECTED) {
                         if (connection.discovery_present_received(msg)) {
+                            LOG("Responding", "");
                             message connectMessage = {DISCOVERY::RESPOND, 0,
                                                       connection.id,
                                                       msg.sender, 0};
                             unicast_close_if_fail(connectMessage);
+                        } else {
+                            LOG("Not Responding", "");
                         }
+                    } else {
+                        LOG("Already connected", "" );
                     }
                     break;
                 case DISCOVERY::RESPOND: {
-                    if (connection.discovery_respond_received(msg)) {
 
+                    if (connection.discovery_respond_received(msg)) {
                         message finishMessage = {DISCOVERY::ACCEPT, 0, connection.id,
                                                  msg.sender, 0};
                         if (connection.send(finishMessage)) {
@@ -315,7 +327,12 @@ namespace mesh {
         router &get_router() const {
             return network_router;
         }
+
+
+
     };
+
+
 
 
     /**
