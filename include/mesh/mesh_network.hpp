@@ -13,7 +13,6 @@
 
 #include <mesh/connectivity_adapter.hpp>
 #include <mesh/router.hpp>
-#include <cout_debug.hpp>
 
 
 /**
@@ -113,7 +112,6 @@ namespace mesh {
          * Normally, the update function calls this method periodically, so it doesn't need to be called
          */
         void discover() {
-            LOG("DISCOVERYIN","");
             message message = {DISCOVERY::PRESENT, 0, connection.id, 0,
                                0};
             connection.send(message);
@@ -212,7 +210,6 @@ namespace mesh {
                         continue;
                     }
                     connection.remove_direct_connection(failed[i]);
-                    LOG("Removed", failed[i]);
                 }
                 network_router.send_update();
             }
@@ -243,7 +240,6 @@ namespace mesh {
          * @return True if the message was handled, false if it still needs to be handled by the caller
          */
         bool handleMessage(message &msg) {
-            LOG("MSG", msg.type << " " << hwlib::hex << msg.sender);
             if ((msg.type & 0x10) > 0) { //This is a routing message
                 network_router.on_routing_message(msg);
             }
@@ -259,24 +255,18 @@ namespace mesh {
 
             switch (msg.type) {
                 case DISCOVERY::PRESENT:
-                    LOG("Present", hwlib::hex << msg.sender);
                     if (connection.connection_state(msg.sender) == DISCONNECTED) {
                         if (connection.discovery_present_received(msg)) {
-                            LOG("Responding", "");
                             message connectMessage = {DISCOVERY::RESPOND, 0,
                                                       connection.id,
                                                       msg.sender, 0};
                             unicast_close_if_fail(connectMessage);
-                        } else {
-                            LOG("Not Responding", "");
                         }
-                    } else {
-                        LOG("Already connected", "" );
                     }
                     break;
                 case DISCOVERY::RESPOND: {
-
                     if (connection.discovery_respond_received(msg)) {
+
                         message finishMessage = {DISCOVERY::ACCEPT, 0, connection.id,
                                                  msg.sender, 0};
                         if (connection.send(finishMessage)) {
@@ -327,12 +317,7 @@ namespace mesh {
         router &get_router() const {
             return network_router;
         }
-
-
-
     };
-
-
 
 
     /**

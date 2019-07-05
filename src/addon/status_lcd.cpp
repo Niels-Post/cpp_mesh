@@ -39,7 +39,7 @@ void mesh::addons::status_lcd::update(mesh_network &network) {
         case BLACKLIST:
             break;
     }
-//    lcd.flush();
+    lcd.flush();
 }
 
 void mesh::addons::status_lcd::setCurrentMode(mesh::addons::display_mode currentMode) {

@@ -40,7 +40,7 @@ namespace mesh {
 
             nrf.write_register(NRF_REGISTER::SETUP_RETR, 0xFA);
 
-            nrf.write_register(NRF_REGISTER::RF_SETUP, 0x0E);
+            nrf.write_register(NRF_REGISTER::RF_SETUP, 8);
 
             // Broadcast pipe
             connections[0].setNodeId(0);
@@ -89,8 +89,6 @@ namespace mesh {
         }
 
         void nrf::buffer_messages() {
-
-
             while ((nrf24.fifo_status() & uint8_t(1)) == 0) {
                 uint8_t payload_width = nrf24.rx_payload_width();
                 uint8_t data[payload_width];
@@ -107,7 +105,6 @@ namespace mesh {
                     // The input buffer is full panic
                 }
             }
-
 
         }
 
