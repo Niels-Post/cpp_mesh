@@ -13,6 +13,7 @@
 
 #include <mesh/connectivity_adapter.hpp>
 #include <mesh/router.hpp>
+#include <cout_debug.hpp>
 
 
 /**
@@ -160,12 +161,11 @@ namespace mesh {
          * TODO: seperate this
          */
         void update() {
-            LOG("update", update_count);
             if (update_count++ > discovery_interval) {
                 update_count = 0;
                 discover();
             }
-            if ((update_count % keepalive_interval == 0)) {
+            if (update_count == (keepalive_interval)) {
 
                 message keepalive = {
                         DISCOVERY::NO_OPERATION,
@@ -317,7 +317,12 @@ namespace mesh {
         router &get_router() const {
             return network_router;
         }
+
+
+
     };
+
+
 
 
     /**
